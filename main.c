@@ -19,6 +19,7 @@ int pop(struct stack* stk, double* val);
 int destroyStack(struct stack* stk);
 int readHead(struct stack*, double* val);
 int parseFile(char* outStr, int* outTab, size_t* outLen, char* fileName);
+int makeRPM(char* inStr, size_t len, char* outStr);
 
 int main()
 {
@@ -30,7 +31,11 @@ int main()
   printf(buff);
   printf("\n");
   printf("a = %d, b = %d\n", Tab[(int)'a'], Tab[(int)'b']);
+  char RPMbuff[2000] = {};
 
+  printf("%d\n", makeRPM(buff, len, RPMbuff));
+  printf(RPMbuff);
+  printf("\n");
   return 0;
 }
 
@@ -124,6 +129,124 @@ int parseFile(char* outStr, int* outTab, size_t* outLen, char* fileName)
   }
 
   fclose(fPtr);
+
+  return 0;
+}
+
+int makeRPM(char* inStr, size_t len, char* outStr)
+{
+  if(!inStr || !outStr) return -1;
+
+  char Tab[256] = {};
+  for(int i = (int)'A'; i <= (int)'Z'; i++)
+  {
+    Tab[i] = -1;
+  }
+  for(int i = (int)'a'; i <= (int)'z'; i++)
+  {
+    Tab[i] = -1;
+  }
+  for(int i = (int)'0'; i <= (int)'9'; i++)
+  {
+    Tab[i] = -1;
+  }
+
+  char operands[8] = "-+*/()=";
+  char prio[7] = {4,4,5,5,1,2,3};
+  for(size_t i = 0; i < 7; i++)
+  {
+    Tab[(int)operands[i]] = prio[i];
+  }
+
+
+  struct stack stk;
+  stk.first = NULL;
+  stk.size = 0;
+
+  size_t j = 0;
+  double top = 0;
+  for(size_t i = 0; i < len; i++)
+  {
+    if(Tab[(int)inStr[i]] == -1)
+    {
+      outStr[j] = inStr[i]; // if operand
+      j++;
+    }
+    else if(Tab[(int)inStr[i]] == 1 || (!(stk.first) && Tab[(int)inStr[i]]))
+    {
+      if(push(&stk, (double)inStr[i]))
+      {
+        destroyStack(&stk);
+        return 2;
+      }
+    }
+    else if(!readHead(&stk, &top) && (Tab[(int)inStr[i]] > Tab[(int)top]))
+    {
+      if(Tab[(int)inStr[i]] == 2)
+      {
+        destroyStack(&stk);
+        return 2;
+      }
+      if(push(&stk, (double)inStr[i]))
+      {
+        destroyStack(&stk);
+        return 2;
+      }
+    }
+    else if(Tab[(int)inStr[i]] > 0)
+    {
+      while(stk.size > 0 && !readHead(&stk, &top) && Tab[(int)inStr[i]] <= Tab[(int)top])
+      {
+        if(pop(&stk, &top))
+        {
+          destroyStack(&stk);
+          return 2;
+        }
+        outStr[j] = (char)top;
+        j++;
+      }
+      if(Tab[(int)inStr[i]] == 2)
+      {
+        if(Tab[(int)top] == 1)
+        {
+          if(pop(&stk, &top))
+          {
+            destroyStack(&stk);
+            return 2;
+          }
+        }
+        else
+        {
+          destroyStack(&stk);
+          return 2;
+        }
+      }
+      else
+      {
+        if(push(&stk, (double)inStr[i]))
+        {
+          destroyStack(&stk);
+          return 2;
+        }
+      }
+    }
+    else
+    {
+      destroyStack(&stk);
+      return 2;
+    }
+  }
+  while(stk.size > 0)
+  {
+    if(pop(&stk, &top))
+    {
+      destroyStack(&stk);
+      return 2;
+    }
+    outStr[j] = (char)top;
+    j++;
+  }
+  outStr[j] = '\0';
 
   return 0;
 }
