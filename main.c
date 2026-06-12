@@ -45,3 +45,8 @@ int destroy(struct stack** stk)
 
 
 }
+
+int readHead(struct stack*, double* val)
+{
+
+}
