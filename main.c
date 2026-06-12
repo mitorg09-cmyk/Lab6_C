@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct point
 {
@@ -17,6 +18,7 @@ int push(struct stack* stk, double val);
 int pop(struct stack* stk, double* val);
 int destroyStack(struct stack** stk);
 int readHead(struct stack*, double* val);
+int parseFile(char* outStr, int* outTab, size_t* outLen, char* fileName);
 
 int main()
 {
@@ -82,4 +84,9 @@ int readHead(struct stack* stk, double* val)
   *val = stk->first->val;
 
   return 0;
+}
+
+int parseFile(char* outStr, int* outTab, size_t* outLen, char* fileName)
+{
+
 }
