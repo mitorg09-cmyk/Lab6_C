@@ -16,13 +16,20 @@ struct stack
 
 int push(struct stack* stk, double val);
 int pop(struct stack* stk, double* val);
-int destroyStack(struct stack** stk);
+int destroyStack(struct stack* stk);
 int readHead(struct stack*, double* val);
 int parseFile(char* outStr, int* outTab, size_t* outLen, char* fileName);
 
 int main()
 {
+  int Tab[256] = {};
+  char buff[2000] = {};
+  size_t len = 0;
 
+  printf("%d\n", parseFile(buff, Tab, &len, "huy.txt"));
+  printf(buff);
+  printf("\n");
+  printf("a = %d, b = %d\n", Tab[(int)'a'], Tab[(int)'b']);
 
   return 0;
 }
@@ -88,5 +95,35 @@ int readHead(struct stack* stk, double* val)
 
 int parseFile(char* outStr, int* outTab, size_t* outLen, char* fileName)
 {
+  if(!outStr || !outTab || !outLen || !fileName) return -1;
 
+  FILE* fPtr = fopen(fileName, "rb");
+  if(!fPtr) return 3;
+
+  char el = 0;
+  size_t i = 0;
+  while(fscanf(fPtr, "%c", &el) != -1 && el != '\n' && i < 2000)
+  {
+    if(el != ' ')
+    {
+      outStr[i] = el;
+      i++;
+    }
+
+  }
+  if(i >= 2000) return 4;
+  *outLen = i;
+  outStr[i] = '\0';
+
+  int val = 0;
+  while(fscanf(fPtr, "%c=%d", &el, &val) == 2)
+  {
+    if((el < (char)'A' || el > (char)'Z') && (el < (char)'a' || el > (char)'z')) return 4;
+
+    outTab[(int)el] = val;
+  }
+
+  fclose(fPtr);
+
+  return 0;
 }
