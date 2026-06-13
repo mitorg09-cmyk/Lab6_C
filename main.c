@@ -171,9 +171,9 @@ int makeRPM(char* inStr, size_t len, char* outStr)
   stk.size = 0;
 
   // TEST !!!
-  struct stack brctsStack;
-  stk.first = NULL;
-  stk.size = 0;
+  // struct stack brctsStack;
+  // stk.first = NULL;
+  // stk.size = 0;
   // TEST !!!
 
   char prevPrio = 4;
@@ -186,15 +186,15 @@ int makeRPM(char* inStr, size_t len, char* outStr)
     {
       outStr[j] = inStr[i]; // if operand
       j++;
-      prevPrio = Tab[(int)inStr[i]];
+      prevPrio = Tab[(int)inStr[i]]; // prev is operand
     }
-    else if(inStr[i] == '-' && prevPrio != -1 && prevPrio != 2)
-    {
+    // else if(inStr[i] == '-' && prevPrio != -1 && prevPrio != 2)
+    // {
 
-    }
+    // }
     else if(Tab[(int)inStr[i]] == 1 || (!(stk.first) && Tab[(int)inStr[i]]))
     {
-      if(Tab[(int)inStr[i]] == 2)
+      if(Tab[(int)inStr[i]] == 2) // if begin with ')' - ERROR
       {
         destroyStack(&stk);
         return 2;
@@ -205,11 +205,11 @@ int makeRPM(char* inStr, size_t len, char* outStr)
         return 2;
       }
 
-      prevPrio = Tab[(int)inStr[i]];
+      prevPrio = Tab[(int)inStr[i]]; // prev is '(' or operation in begin
     }
     else if(!readHead(&stk, &top) && (Tab[(int)inStr[i]] > Tab[(int)top]))
     {
-      if(Tab[(int)inStr[i]] == 2)
+      if(Tab[(int)inStr[i]] == 2) // bigger  only if ')' after '(' - ERROR
       {
         destroyStack(&stk);
         return 2;
@@ -220,7 +220,7 @@ int makeRPM(char* inStr, size_t len, char* outStr)
         return 2;
       }
 
-      prevPrio = Tab[(int)inStr[i]];
+      prevPrio = Tab[(int)inStr[i]]; // operation
     }
     else if(Tab[(int)inStr[i]] > 0)
     {
@@ -238,13 +238,13 @@ int makeRPM(char* inStr, size_t len, char* outStr)
       {
         if(Tab[(int)top] == 1)
         {
-          if(pop(&stk, &top))
+          if(pop(&stk, &top)) // pop '(' without writing
           {
             destroyStack(&stk);
             return 2;
           }
         }
-        else
+        else // if ')' without '(' - ERROR
         {
           destroyStack(&stk);
           return 2;
@@ -263,8 +263,9 @@ int makeRPM(char* inStr, size_t len, char* outStr)
     }
     else if(inStr[i] == ' ')
     {
+      // just skip
     }
-    else
+    else // incorrect symbol - ERROR
     {
       destroyStack(&stk);
       return 2;
@@ -277,7 +278,7 @@ int makeRPM(char* inStr, size_t len, char* outStr)
       destroyStack(&stk);
       return 2;
     }
-    if(Tab[(int)top] != 1)
+    if(Tab[(int)top] != 1) // All operations writing, without '(' - just skip
     {
       outStr[j] = (char)top;
       j++;
