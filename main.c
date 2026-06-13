@@ -116,20 +116,27 @@ int parseFile(char* outStr, int* outTab, size_t* outLen, char* fileName)
     }
 
   }
-  if(i >= 2000) return 4;
+  if(i >= 2000)
+  {
+    fclose(fPtr);
+    return 4;
+  }
   *outLen = i;
   outStr[i] = '\0';
 
   int val = 0;
   while(fscanf(fPtr, "%c=%d", &el, &val) == 2)
   {
-    if((el < (char)'A' || el > (char)'Z') && (el < (char)'a' || el > (char)'z')) return 4;
+    if((el < (char)'A' || el > (char)'Z') && (el < (char)'a' || el > (char)'z'))
+    {
+      fclose(fPtr);
+      return 4;
+    }
 
     outTab[(int)el] = val;
   }
 
   fclose(fPtr);
-
   return 0;
 }
 
@@ -163,6 +170,14 @@ int makeRPM(char* inStr, size_t len, char* outStr)
   stk.first = NULL;
   stk.size = 0;
 
+  // TEST !!!
+  struct stack brctsStack;
+  stk.first = NULL;
+  stk.size = 0;
+  // TEST !!!
+
+  char prevPrio = 4;
+
   size_t j = 0;
   double top = 0;
   for(size_t i = 0; i < len; i++)
@@ -171,14 +186,26 @@ int makeRPM(char* inStr, size_t len, char* outStr)
     {
       outStr[j] = inStr[i]; // if operand
       j++;
+      prevPrio = Tab[(int)inStr[i]];
+    }
+    else if(inStr[i] == '-' && prevPrio != -1 && prevPrio != 2)
+    {
+
     }
     else if(Tab[(int)inStr[i]] == 1 || (!(stk.first) && Tab[(int)inStr[i]]))
     {
+      if(Tab[(int)inStr[i]] == 2)
+      {
+        destroyStack(&stk);
+        return 2;
+      }
       if(push(&stk, (double)inStr[i]))
       {
         destroyStack(&stk);
         return 2;
       }
+
+      prevPrio = Tab[(int)inStr[i]];
     }
     else if(!readHead(&stk, &top) && (Tab[(int)inStr[i]] > Tab[(int)top]))
     {
@@ -192,6 +219,8 @@ int makeRPM(char* inStr, size_t len, char* outStr)
         destroyStack(&stk);
         return 2;
       }
+
+      prevPrio = Tab[(int)inStr[i]];
     }
     else if(Tab[(int)inStr[i]] > 0)
     {
@@ -229,6 +258,11 @@ int makeRPM(char* inStr, size_t len, char* outStr)
           return 2;
         }
       }
+
+      prevPrio = Tab[(int)inStr[i]];
+    }
+    else if(inStr[i] == ' ')
+    {
     }
     else
     {
@@ -243,8 +277,11 @@ int makeRPM(char* inStr, size_t len, char* outStr)
       destroyStack(&stk);
       return 2;
     }
-    outStr[j] = (char)top;
-    j++;
+    if(Tab[(int)top] != 1)
+    {
+      outStr[j] = (char)top;
+      j++;
+    }
   }
   outStr[j] = '\0';
 
