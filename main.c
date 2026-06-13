@@ -27,7 +27,7 @@ int main()
   char buff[2000] = {};
   size_t len = 0;
 
-  printf("%d\n", parseFile(buff, Tab, &len, "huy.txt"));
+  printf("%d\n", parseFile(buff, Tab, &len, "test.txt"));
   printf(buff);
   printf("\n");
   printf("a = %d, b = %d\n", Tab[(int)'a'], Tab[(int)'b']);
@@ -188,10 +188,24 @@ int makeRPM(char* inStr, size_t len, char* outStr)
       j++;
       prevPrio = Tab[(int)inStr[i]]; // prev is operand
     }
-    // else if(inStr[i] == '-' && prevPrio != -1 && prevPrio != 2)
-    // {
+    else if(Tab[(int)inStr[i]] == 4 && prevPrio != -1 && prevPrio != 2) // Unar + and -
+    {
+      if(inStr[i] == '-')
+      {
+        outStr[j] = '0';
+        j++;
 
-    // }
+        if(push(&stk, (double)'-'))
+        {
+          destroyStack(&stk);
+          return 2;
+        }
+      }
+      else
+      {
+        // skip '+'
+      }
+    }
     else if(Tab[(int)inStr[i]] == 1 || (!(stk.first) && Tab[(int)inStr[i]]))
     {
       if(Tab[(int)inStr[i]] == 2) // if begin with ')' - ERROR
