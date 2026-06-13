@@ -47,7 +47,7 @@ int push(struct stack* stk, double val)
   if(!newPoint) return 2;
 
   newPoint->val = val;
-  newPoint->next = stk->first; // if new stack than NULL
+  newPoint->next = stk->first; // if new stack then NULL
   stk->first = newPoint;
 
   stk->size++;
@@ -63,7 +63,7 @@ int pop(struct stack* stk, double* val)
   *val = stk->first->val;
   struct point* fHead = stk->first;
 
-  stk->first = stk->first->next; // if one elem than NULL
+  stk->first = stk->first->next; // if one elem then NULL
   stk->size--;
 
   free(fHead);
