@@ -223,12 +223,28 @@ int makeRPM(char* inStr, size_t len, char* outStr)
     }
     else if(!readHead(&stk, &top) && (Tab[(int)inStr[i]] > Tab[(int)top]))
     {
-      if(Tab[(int)inStr[i]] == 2) // bigger  only if ')' after '(' - ERROR
+      if(Tab[(int)inStr[i]] == 2) // if current elem = ')' and prev valid elem = '(' ERROR
       {
-        destroyStack(&stk);
-        return 2;
+        if(prevPrio == 1)
+        {
+          destroyStack(&stk);
+          return 2;
+        }
+        else
+        {
+          if(pop(&stk, &top)) // pop '(' without writing
+          {
+            destroyStack(&stk);
+            return 2;
+          }
+        }
       }
-      if(push(&stk, (double)inStr[i]))
+      // if(Tab[(int)inStr[i]] == 2) // bigger  only if ')' after '(' - ERROR
+      // {
+      //   destroyStack(&stk);
+      //   return 2;
+      // }
+      else if(push(&stk, (double)inStr[i]))
       {
         destroyStack(&stk);
         return 2;
@@ -252,6 +268,11 @@ int makeRPM(char* inStr, size_t len, char* outStr)
       {
         if(Tab[(int)top] == 1)
         {
+          if(prevPrio == 1)
+          {
+            destroyStack(&stk);
+            return 2;
+          }
           if(pop(&stk, &top)) // pop '(' without writing
           {
             destroyStack(&stk);
